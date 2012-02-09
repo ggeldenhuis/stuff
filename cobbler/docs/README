@@ -1,6 +1,7 @@
 The idea of this script is to have an easy way to populate a cobbler server.
 It also allows you to template information ensuring less mistakes.
 
+
 You might well argue that this is a duplication of what cobbler does already
 and you would be right. Why don't I just use cobbler templates? The honest 
 reason was that where it was needed it was just easier to write this than 
