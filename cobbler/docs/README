@@ -1,0 +1,24 @@
+The idea of this script is to have an easy way to populate a cobbler server.
+It also allows you to template information ensuring less mistakes.
+
+You might well argue that this is a duplication of what cobbler does already
+and you would be right. Why don't I just use cobbler templates? The honest 
+reason was that where it was needed it was just easier to write this than 
+try to template a non-standard environment. That being said I think it is 
+still usefull and it gives you a way to version control server config. You
+could have a scenario where you update the config. A git/svn trigger is 
+called which updates the cobbler server and you are thus assured of an up
+to date cobbler server should you then need to rebuild a server. Off course 
+this does not take care of the actual updating of the machine.
+
+Another possible advantage which is something that we were looking at is to
+use the yaml files as a lightweight CMDB. We can thus use it as a source for
+hiera which in turn gets read by puppet. So if puppet needs to set settings
+it uses the same config files as does cobbler.
+
+If I am really honest this would all just be a nice python exersize, so use
+it don't use it. If you like it drop me an email, if you don't like it 
+tell me why and suggest an improvement or a different point of view. 
+
+Gerrard
+gerhardus.geldenhuis@gmail.com
