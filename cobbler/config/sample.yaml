@@ -1,0 +1,109 @@
+--- 
+- &reference_virt_appserver
+  name: reference_virt_appserver
+  ks_meta: server_class=static puppetenvironment=devops31 server_env=london server_datacentre=Telehouse disks=sda
+  gateway: 10.53.33.253
+  kernel_options: selinux=0 pci=bfsort
+  name_servers: 10.53.33.168 10.53.33.169
+  name_servers_search: london.example.com example.com 
+  profile: "rhel5u4-x86_64"
+  interfaces:
+    eth0: &eth0_virt_app # Infrastructure
+      static: "True"
+      subnet: 255.255.255.128
+    eth1: &eth1_virt_app # Appliction
+      static: "True"
+      subnet: 255.255.255.128
+    eth2: &eth2_virt_app # Metadata
+      static: "True"
+      subnet: 255.255.255.192
+    eth3: &eth3_virt_app # Backup
+      static: "True"
+      subnet: 255.255.255.128
+
+- &reference_phys_appserver
+  name: reference_phys_appserver
+  ks_meta: server_class=static puppetenvironment=devops31 server_env=london server_datacentre=Telehouse disks=cciss/c0d0
+  gateway: 10.53.33.253
+  name_servers: 10.53.33.168 10.53.33.169
+  name_servers_search: london.example.com example.com 
+  profile: "rhel5u5-x86_64"
+  interfaces:
+    eth0: &eth0_phys_app 
+      bonding: slave
+      bonding_master: bond0
+    eth1: &eth1_phys_app 
+      bonding: slave
+      bonding_master: bond0
+    bond0: &bond0_phys_app # Infrastructure
+      bonding: master
+      bonding_opts: miimon=100 mode=1
+      static: "True"
+      subnet: 255.255.255.128
+    bond0.10: &bond0_10_phys_app # Backup
+      static: "True"
+      subnet: 255.255.255.128
+    bond0.1700: &bond0_1700_phys_app # Application
+      static: "True"
+      subnet: 255.255.255.128
+    bond0.4091: &bond0_4091_phys_app # Metadata
+      static: "True"
+      subnet: 255.255.255.192
+
+###################################################
+# End of references, all server configs to follow #
+###################################################
+
+- <<: *reference_virt_appserver
+  name: server01.example.com
+  hostname: server01.example.com
+  interfaces:
+    eth0: 
+      <<: *eth0_virt_app # Infrastructure
+      macaddress: 00:50:56:95:02:68 
+      ipaddress: 10.53.33.179
+    eth1: 
+      <<: *eth1_virt_app # Application
+      macaddress: 00:50:56:95:02:69
+      ipaddress: 10.53.96.37
+    eth2: 
+      <<: *eth2_virt_app # Database
+      macaddress: 00:50:56:95:02:8d
+      ipaddress: 10.53.97.11
+
+- <<: *reference_virt_appserver
+  name: server02.example.com
+  hostname: server02.example.com
+  interfaces:
+    eth0: 
+      <<: *eth0_virt_app # Infrastructure
+      macaddress: 00:50:56:85:01:8e 
+      ipaddress: 10.53.33.180
+    eth1: 
+      <<: *eth1_virt_app # Application
+      macaddress: 00:50:56:85:01:1b
+      ipaddress: 10.53.96.38
+    eth2: 
+      <<: *eth2_virt_app # Database
+      macaddress: 00:50:56:95:05:b3
+      ipaddress: 10.53.97.12
+
+- <<: *reference_phys_appserver
+  name: server03.example.com
+  hostname: server03.example.com
+  interfaces: 
+    eth0:
+      <<: *eth0_phys_app 
+      macaddress: 00:17:A4:73:E4:70
+    eth1:
+      <<: *eth1_phys_app
+      macaddress: 00:17:A4:78:C4:72
+    bond0: # Infrastructure
+      <<: *bond0_phys_app
+      ipaddress: 10.53.33.137
+    bond0.10: # Backup
+      <<: *bond0_10_phys_app
+      ipaddress: 10.53.96.137
+    bond0.1700: # Application
+      <<: *bond0_1700_phys_app
+      ipaddress: 10.53.96.9
